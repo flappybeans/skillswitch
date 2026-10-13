@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { logout } from "@/app/(auth)/actions";
 import { usePathname } from "next/navigation";
 import {
   Users,
@@ -10,8 +11,10 @@ import {
   User,
   Repeat,
   type LucideIcon,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { Button } from "@/components/ui/buttons";
 
 type NavItem = {
   href: string;
@@ -66,6 +69,13 @@ export function Nav() {
               );
             })}
           </nav>
+
+          <form action={logout}>
+            <Button variant="ghost" size="sm" type="submit">
+              <LogOut className="size-4" />
+              <span className="hidden sm:inline">Log out</span>
+            </Button>
+          </form>
         </div>
       </header>
 
