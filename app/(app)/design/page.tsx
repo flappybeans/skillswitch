@@ -7,15 +7,15 @@ import { Input } from "@/components/ui/input";
 export default function DesignPage() {
   return (
     <div className="space-y-8">
-      <h1 className="text-5xl font-extrabold">
-        Teach one. <span className="text-primary">Learn one.</span>
+      <h1 className="text-5xl font-medium">
+        Teach one. <span className="text-muted-foreground">Learn one.</span>
       </h1>
 
       <Card className="space-y-5">
         <div className="flex items-center gap-3">
           <Avatar name="Alex Chen" />
           <div>
-            <p className="font-display font-bold">Alex Chen</p>
+            <p className="font-display font-semibold">Alex Chen</p>
             <p className="text-sm text-muted-foreground">Computer Science</p>
           </div>
           <Badge tone="points" className="ml-auto">+25 pts</Badge>

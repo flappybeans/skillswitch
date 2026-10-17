@@ -72,7 +72,7 @@ export function SkillPicker({ skills, initialTeach, initialLearn }: SkillPickerP
         onToggle={toggle}
       />
       {error && (
-        <p role="alert" className="text-sm font-semibold text-danger">
+        <p role="alert" className="text-sm font-medium text-danger">
           {error}
         </p>
       )}
@@ -91,7 +91,7 @@ interface GroupProps {
 function Group({ title, kind, skills, selected, onToggle }: GroupProps) {
   return (
     <div className="space-y-2">
-      <p className="text-sm font-semibold">
+      <p className="text-sm font-medium">
         {title}{" "}
         <span className="text-muted-foreground">
           ({selected.size}/{MAX_SKILLS_PER_KIND})
@@ -107,7 +107,7 @@ function Group({ title, kind, skills, selected, onToggle }: GroupProps) {
               aria-pressed={on}
               onClick={() => onToggle(kind, skill.id)}
               className={cn(
-                "rounded-full border-[1.5px] border-line px-3 py-1 text-sm font-semibold transition-colors",
+                "rounded-full border border-line px-3 py-1 text-sm font-medium transition-colors",
                 on
                   ? kind === "teach"
                     ? "bg-primary text-primary-foreground"

@@ -14,7 +14,7 @@ import { SkillPicker } from "./skill-picker";
 export default function ProfilePage() {
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-4xl font-extrabold">Your profile</h1>
+      <h1 className="font-display text-4xl font-semibold">Your profile</h1>
       <Suspense fallback={<ProfileSkeleton />}>
         <ProfileEditor />
       </Suspense>
@@ -48,7 +48,7 @@ async function ProfileEditor() {
           avatarUrl={profile.avatar_url}
         />
         <div>
-          <p className="font-display text-xl font-bold">{displayName}</p>
+          <p className="font-display text-xl font-semibold">{displayName}</p>
           <p className="text-sm text-muted-foreground">@{profile.username}</p>
         </div>
         <Badge tone="points">{profile.points} pts</Badge>
@@ -62,7 +62,7 @@ async function ProfileEditor() {
 
       <div className="space-y-6">
         <Card className="space-y-5">
-          <h2 className="text-2xl font-extrabold">Details</h2>
+          <h2 className="text-2xl font-semibold">Details</h2>
           <ProfileForm
             initial={{
               full_name: profile.full_name ?? "",
@@ -74,7 +74,7 @@ async function ProfileEditor() {
 
         <Card className="space-y-5">
           <div>
-            <h2 className="text-2xl font-extrabold">Skills</h2>
+            <h2 className="text-2xl font-semibold">Skills</h2>
             <p className="text-sm text-muted-foreground">
               Tap to select, up to {MAX_SKILLS_PER_KIND} in each list. This is what
               your matches are based on.

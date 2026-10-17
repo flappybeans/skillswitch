@@ -39,13 +39,13 @@ export function SignupForm() {
       {state.error && (
         <p
           role="alert"
-          className="rounded-md border-[1.5px] border-line bg-danger/10 px-3 py-2 text-sm font-semibold text-danger"
+          className="rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-sm font-medium text-danger"
         >
           {state.error}
         </p>
       )}
       {state.notice && (
-        <p className="rounded-md border-[1.5px] border-line bg-accent px-3 py-2 text-sm font-semibold text-accent-foreground">
+        <p className="rounded-md border border-primary/20 bg-accent px-3 py-2 text-sm font-medium text-accent-foreground">
           {state.notice}
         </p>
       )}
@@ -56,7 +56,7 @@ export function SignupForm() {
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold text-primary underline">
+        <Link href="/login" className="font-medium text-primary-ink underline underline-offset-4">
           Log in
         </Link>
       </p>

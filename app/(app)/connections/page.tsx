@@ -6,7 +6,7 @@ import { buttonClasses } from "@/components/ui/buttons";
 import { Card } from "@/components/ui/card";
 import { getCurrentProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { ConnectionActions } from "./connection-actions";
+import { ConnectionActions } from "./connections-actions";
 
 type Pal = {
   id: string;
@@ -18,7 +18,7 @@ type Pal = {
 export default function ConnectionsPage() {
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-4xl font-extrabold">Connections</h1>
+      <h1 className="font-display text-4xl font-semibold">Connections</h1>
       <Suspense fallback={<div className="h-64 animate-pulse rounded-lg bg-muted" aria-hidden />}>
         <ConnectionLists />
       </Suspense>
@@ -38,13 +38,13 @@ async function ConnectionLists() {
     .order("created_at", { ascending: false });
 
   if (error || !rows) {
-    return <Card className="text-center font-semibold">Couldn&apos;t load connections.</Card>;
+    return <Card className="text-center font-medium">Couldn&apos;t load connections.</Card>;
   }
 
   if (rows.length === 0) {
     return (
       <Card className="space-y-3 text-center">
-        <p className="font-semibold">No connections yet.</p>
+        <p className="font-medium">No connections yet.</p>
         <Link href="/find-pair" className={buttonClasses({ size: "sm" })}>
           Find a pair
         </Link>
@@ -116,13 +116,13 @@ function Section({
 }) {
   return (
     <Card className="space-y-2">
-      <h2 className="text-xl font-extrabold">
+      <h2 className="text-xl font-semibold">
         {title} <span className="text-muted-foreground">({count})</span>
       </h2>
       {count === 0 ? (
         <p className="text-sm text-muted-foreground">{empty}</p>
       ) : (
-        <ul className="divide-y-[1.5px] divide-line">{children}</ul>
+        <ul className="divide-y divide-line">{children}</ul>
       )}
     </Card>
   );
@@ -143,7 +143,7 @@ function PersonRow({
       <div className="min-w-0 flex-1">
         <Link
           href={`/u/${person.username}`}
-          className="block truncate font-semibold hover:underline"
+          className="block truncate font-medium hover:underline"
         >
           {name}
         </Link>

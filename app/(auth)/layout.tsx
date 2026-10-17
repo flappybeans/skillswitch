@@ -10,9 +10,9 @@ export default function AuthLayout({
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center gap-6 px-4 py-10">
       <Link
         href="/"
-        className="flex items-center gap-2 self-center font-display text-2xl font-extrabold"
+        className="flex items-center gap-2.5 self-center font-display text-xl font-medium tracking-tight"
       >
-        <span className="grid size-10 place-items-center rounded-md border-[1.5px] border-line bg-primary text-primary-foreground shadow-brutal-sm">
+        <span className="grid size-9 place-items-center rounded-md bg-primary text-primary-foreground">
           <Repeat className="size-5" />
         </span>
         SkillSwitch

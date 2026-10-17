@@ -11,7 +11,7 @@ export function Field({ label, hint, id, ...props }: FieldProps) {
 
   return (
     <div className="space-y-1.5">
-      <label htmlFor={inputId} className="text-sm font-semibold">
+      <label htmlFor={inputId} className="text-sm font-medium">
         {label}
       </label>
       <Input id={inputId} {...props} />

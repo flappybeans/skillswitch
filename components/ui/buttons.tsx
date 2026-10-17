@@ -5,10 +5,12 @@ type Variant = "primary" | "outline" | "ghost" | "danger";
 type Size = "sm" | "md" | "lg";
 
 const variantStyles: Record<Variant, string> = {
-  primary: "bg-primary text-primary-foreground shadow-brutal-sm hover:bg-primary/90",
-  outline: "bg-card text-foreground shadow-brutal-sm hover:bg-muted",
-  ghost: "border-transparent hover:bg-muted",
-  danger: "bg-danger text-white shadow-brutal-sm",
+  primary:
+    "border-transparent bg-primary text-primary-foreground hover:bg-primary/90",
+  outline: "border-line bg-card text-foreground hover:bg-muted",
+  ghost: "border-transparent text-foreground hover:bg-muted",
+  danger:
+    "border-transparent bg-danger text-danger-foreground hover:bg-danger/90",
 };
 
 const sizeStyles: Record<Size, string> = {
@@ -29,8 +31,8 @@ export function buttonClasses({
   className,
 }: ButtonStyleOptions = {}): string {
   return cn(
-    "inline-flex items-center justify-center gap-2 rounded-md border-[1.5px] border-line font-semibold",
-    "transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+    "inline-flex items-center justify-center gap-2 rounded-md border font-medium",
+    "transition-colors",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
     "disabled:pointer-events-none disabled:opacity-50",
     variantStyles[variant],

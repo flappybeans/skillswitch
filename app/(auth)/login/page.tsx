@@ -11,7 +11,7 @@ export default function LoginPage({
 }) {
   return (
     <Card className="space-y-5">
-      <h1 className="text-3xl font-extrabold">Welcome back</h1>
+      <h1 className="text-3xl font-semibold">Welcome back</h1>
 
       <Suspense fallback={<LoginSkeleton />}>
         <LoginContent searchParams={searchParams} />
@@ -35,7 +35,7 @@ async function LoginContent({
       {deactivated && (
         <p
           role="alert"
-          className="rounded-md border-[1.5px] border-line bg-danger/10 px-3 py-2 text-sm font-semibold text-danger"
+          className="rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-sm font-medium text-danger"
         >
           This account has been deactivated.
         </p>

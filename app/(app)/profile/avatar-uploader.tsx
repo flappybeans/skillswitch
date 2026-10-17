@@ -132,7 +132,7 @@ export function AvatarUploader({ userId, name, avatarUrl }: AvatarUploaderProps)
       </div>
 
       {error && (
-        <p role="alert" className="text-sm font-semibold text-danger">
+        <p role="alert" className="text-sm font-medium text-danger">
           {error}
         </p>
       )}

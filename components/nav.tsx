@@ -39,14 +39,14 @@ export function Nav() {
   return (
     <>
       {/* Top bar: logo always, links on desktop only */}
-      <header className="sticky top-0 z-40 border-b-[1.5px] border-line bg-background/90 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-line bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
           <Link
             href="/design"
-            className="flex items-center gap-2 font-display text-xl font-extrabold"
+            className="flex items-center gap-2.5 font-display text-lg font-medium tracking-tight"
           >
-            <span className="grid size-9 place-items-center rounded-md border-[1.5px] border-line bg-primary text-primary-foreground shadow-brutal-sm">
-              <Repeat className="size-5" />
+            <span className="grid size-8 place-items-center rounded-md bg-primary text-primary-foreground">
+              <Repeat className="size-4" />
             </span>
             SkillSwitch
           </Link>
@@ -59,8 +59,10 @@ export function Nav() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-2 rounded-md border-[1.5px] border-transparent px-3 py-2 text-sm font-semibold hover:bg-muted",
-                    isActive(item.href) && "border-line bg-accent text-accent-foreground"
+                    "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    isActive(item.href)
+                      ? "bg-accent text-accent-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
                   <Icon className="size-4" />
@@ -80,7 +82,7 @@ export function Nav() {
       </header>
 
       {/* Bottom tab bar: mobile only */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t-[1.5px] border-line bg-card md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden">
         {items.map((item) => {
           const Icon = item.icon;
           return (
@@ -88,9 +90,9 @@ export function Nav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-1 flex-col items-center gap-1 py-2.5 text-[11px] font-semibold",
+                "flex flex-1 flex-col items-center gap-1 py-2.5 text-[11px] font-medium transition-colors",
                 isActive(item.href)
-                  ? "bg-accent text-accent-foreground"
+                  ? "text-primary-ink"
                   : "text-muted-foreground"
               )}
             >

@@ -27,7 +27,7 @@ export function Avatar({ name, src, size = 40, className }: AvatarProps) {
         alt={name}
         style={box}
         className={cn(
-          "rounded-full border-[1.5px] border-line object-cover",
+          "rounded-full border border-line object-cover",
           className
         )}
       />
@@ -38,7 +38,7 @@ export function Avatar({ name, src, size = 40, className }: AvatarProps) {
     <div
       style={{ ...box, fontSize: size * 0.4 }}
       className={cn(
-        "grid place-items-center rounded-full border-[1.5px] border-line bg-muted font-display font-bold",
+        "grid place-items-center rounded-full border border-line bg-muted font-display font-semibold",
         className
       )}
       aria-label={name}

@@ -31,7 +31,7 @@ export function StudentCard({ candidate: c }: { candidate: Candidate }) {
         <div className="min-w-0 flex-1">
           <Link
             href={`/u/${c.username}`}
-            className="block truncate font-display font-bold hover:underline"
+            className="block truncate font-display font-semibold hover:underline"
           >
             {name}
           </Link>
@@ -41,8 +41,8 @@ export function StudentCard({ candidate: c }: { candidate: Candidate }) {
       </div>
 
       {c.match.mutual && (
-        <p className="flex items-center gap-1.5 text-sm font-semibold">
-          <ArrowLeftRight className="size-4 text-primary" />
+        <p className="flex items-center gap-1.5 text-sm font-medium">
+          <ArrowLeftRight className="size-4 text-primary-ink" />
           Mutual swap possible
         </p>
       )}
@@ -55,16 +55,16 @@ export function StudentCard({ candidate: c }: { candidate: Candidate }) {
       <SkillRow label="Wants to learn" skills={c.person.learn} tone="outline" />
 
       {(c.match.theyCanTeachMe.length > 0 || c.match.iCanTeachThem.length > 0) && (
-        <div className="space-y-1 rounded-md border-[1.5px] border-line bg-muted p-3 text-sm">
+        <div className="space-y-1 rounded-md border border-line bg-muted p-3 text-sm">
           {c.match.theyCanTeachMe.length > 0 && (
             <p>
-              <span className="font-semibold">They can teach you:</span>{" "}
+              <span className="font-medium">They can teach you:</span>{" "}
               {names(c.match.theyCanTeachMe)}
             </p>
           )}
           {c.match.iCanTeachThem.length > 0 && (
             <p>
-              <span className="font-semibold">You can teach them:</span>{" "}
+              <span className="font-medium">You can teach them:</span>{" "}
               {names(c.match.iCanTeachThem)}
             </p>
           )}
@@ -92,7 +92,7 @@ function SkillRow({
 
   return (
     <div className="space-y-1.5">
-      <p className="text-xs font-semibold text-muted-foreground">{label}</p>
+      <p className="text-xs font-medium text-muted-foreground">{label}</p>
       <div className="flex flex-wrap gap-1.5">
         {shown.map((s) => (
           <Badge key={s.id} tone={tone}>

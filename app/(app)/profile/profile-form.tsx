@@ -31,7 +31,7 @@ export function ProfileForm({ initial }: { initial: ProfileValues }) {
       />
 
       <div className="space-y-1.5">
-        <label htmlFor="bio" className="text-sm font-semibold">
+        <label htmlFor="bio" className="text-sm font-medium">
           Bio
         </label>
         <Textarea
@@ -48,13 +48,13 @@ export function ProfileForm({ initial }: { initial: ProfileValues }) {
       {state.error && (
         <p
           role="alert"
-          className="rounded-md border-[1.5px] border-line bg-danger/10 px-3 py-2 text-sm font-semibold text-danger"
+          className="rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-sm font-medium text-danger"
         >
           {state.error}
         </p>
       )}
       {state.saved && (
-        <p className="rounded-md border-[1.5px] border-line bg-accent px-3 py-2 text-sm font-semibold text-accent-foreground">
+        <p className="rounded-md border border-primary/20 bg-accent px-3 py-2 text-sm font-medium text-accent-foreground">
           Saved.
         </p>
       )}

@@ -60,7 +60,7 @@ export function ConnectionActions({ connectionId, mode }: ConnectionActionsProps
           </Button>
         )}
       </div>
-      {error && <p className="text-xs font-semibold text-danger">{error}</p>}
+      {error && <p className="text-xs font-medium text-danger">{error}</p>}
     </div>
   );
 }

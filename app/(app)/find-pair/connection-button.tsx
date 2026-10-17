@@ -73,7 +73,7 @@ export function ConnectionButton({
     <div className="space-y-2">
       {body()}
       {error && (
-        <p role="alert" className="text-xs font-semibold text-danger">
+        <p role="alert" className="text-xs font-medium text-danger">
           {error}
         </p>
       )}

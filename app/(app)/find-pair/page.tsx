@@ -28,7 +28,7 @@ export default function FindPairPage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="font-display text-4xl font-extrabold">Find Pair</h1>
+          <h1 className="font-display text-4xl font-semibold">Find Pair</h1>
           <p className="text-muted-foreground">
             Students who can teach what you want to learn.
           </p>
@@ -100,7 +100,7 @@ async function Browser({ searchParams }: { searchParams: Promise<SearchParams> }
 
   if (skillsRes.error || profilesRes.error || connectionsRes.error || mineRes.error) {
     return (
-      <Card className="text-center font-semibold">
+      <Card className="text-center font-medium">
         Couldn&apos;t load students. Refresh to try again.
       </Card>
     );
@@ -151,7 +151,7 @@ async function Browser({ searchParams }: { searchParams: Promise<SearchParams> }
     <div className="space-y-6">
       {hasNoSkills && (
         <Card className="flex flex-wrap items-center justify-between gap-3 bg-accent text-accent-foreground">
-          <p className="font-semibold">
+          <p className="font-medium">
             Add the skills you teach and want to learn to see match scores.
           </p>
           <Link href="/profile" className={buttonClasses({ variant: "outline", size: "sm" })}>
@@ -201,7 +201,7 @@ async function Browser({ searchParams }: { searchParams: Promise<SearchParams> }
         </div>
       ) : (
         <Card className="text-center">
-          <p className="font-semibold">
+          <p className="font-medium">
             {hasFilters ? "No students match those filters." : "No other students yet."}
           </p>
         </Card>

@@ -27,7 +27,7 @@ export function LoginForm({ next }: { next: string }) {
       {state.error && (
         <p
           role="alert"
-          className="rounded-md border-[1.5px] border-line bg-danger/10 px-3 py-2 text-sm font-semibold text-danger"
+          className="rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-sm font-medium text-danger"
         >
           {state.error}
         </p>
@@ -39,7 +39,7 @@ export function LoginForm({ next }: { next: string }) {
 
       <p className="text-center text-sm text-muted-foreground">
         New here?{" "}
-        <Link href="/signup" className="font-semibold text-primary underline">
+        <Link href="/signup" className="font-medium text-primary-ink underline underline-offset-4">
           Create an account
         </Link>
       </p>

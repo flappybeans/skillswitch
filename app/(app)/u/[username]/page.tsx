@@ -17,7 +17,7 @@ export default function PublicProfilePage({ params }: { params: Params }) {
     <div className="space-y-6">
       <Link
         href="/find-pair"
-        className="inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
         Back
@@ -62,7 +62,7 @@ async function PublicProfile({ params }: { params: Params }) {
 
       <div className="flex-1 space-y-3">
         <div>
-          <h1 className="text-3xl font-extrabold">{displayName}</h1>
+          <h1 className="text-3xl font-semibold">{displayName}</h1>
           <p className="text-muted-foreground">@{profile.username}</p>
         </div>
 
