@@ -2,19 +2,12 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { field, USERNAME_RE } from "@/lib/form";
 
 export type AuthState = {
   error: string | null;
   notice: string | null;
 };
-
-const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
-
-// formData.get() returns string | File | null. We only ever want strings.
-function field(formData: FormData, key: string): string {
-  const value = formData.get(key);
-  return typeof value === "string" ? value : "";
-}
 
 // Only allow redirects to paths inside our own site (blocks open-redirect attacks)
 function safeNext(value: string): string {
