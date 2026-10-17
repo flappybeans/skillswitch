@@ -30,7 +30,7 @@ const items: NavItem[] = [
   { href: "/profile", label: "Profile", icon: User },
 ];
 
-export function Nav() {
+export function Nav({ messagesBadge }: { messagesBadge?: React.ReactNode }) {
   const pathname = usePathname();
 
   const isActive = (href: string): boolean =>
@@ -42,7 +42,7 @@ export function Nav() {
       <header className="sticky top-0 z-40 border-b border-line bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
           <Link
-            href="/find-pair"
+            href="/design"
             className="flex items-center gap-2.5 font-display text-lg font-medium tracking-tight"
           >
             <span className="grid size-8 place-items-center rounded-md bg-primary text-primary-foreground">
@@ -67,6 +67,7 @@ export function Nav() {
                 >
                   <Icon className="size-4" />
                   {item.label}
+                  {item.href === "/messages" && messagesBadge}
                 </Link>
               );
             })}
@@ -96,7 +97,12 @@ export function Nav() {
                   : "text-muted-foreground"
               )}
             >
-              <Icon className="size-5" />
+              <span className="relative">
+                <Icon className="size-5" />
+                {item.href === "/messages" && (
+                  <span className="absolute -right-3 -top-2">{messagesBadge}</span>
+                )}
+              </span>
               {item.label}
             </Link>
           );

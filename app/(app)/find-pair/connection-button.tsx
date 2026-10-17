@@ -1,7 +1,8 @@
 "use client";
 
-import { Check, Clock } from "lucide-react";
-import { Button } from "@/components/ui/buttons";
+import Link from "next/link";
+import { Check, Clock, MessageCircle } from "lucide-react";
+import { Button, buttonClasses } from "@/components/ui/buttons";
 import { assertNever } from "@/lib/assert";
 import type { Relation } from "@/lib/connections";
 import { useAction } from "@/lib/use-action";
@@ -13,9 +14,11 @@ import {
 
 export function ConnectionButton({
   userId,
+  username,
   relation,
 }: {
   userId: string;
+  username: string;
   relation: Relation;
 }) {
   const { pending, error, run } = useAction();
@@ -58,11 +61,14 @@ export function ConnectionButton({
             </Button>
           </div>
         );
-      case "connected":
+            case "connected":
         return (
-          <Button variant="outline" className="w-full" disabled>
-            <Check className="size-4" /> Connected
-          </Button>
+          <Link
+            href={`/messages/${username}`}
+            className={buttonClasses({ variant: "outline", className: "w-full" })}
+          >
+            <MessageCircle className="size-4" /> Message
+          </Link>
         );
       default:
         return assertNever(relation);

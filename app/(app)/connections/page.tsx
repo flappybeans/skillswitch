@@ -87,7 +87,7 @@ async function ConnectionLists() {
       <Section title="Connected" count={connected.length} empty="Nobody yet. Accept a request or send one.">
         {connected.map(({ row, other }) => (
           <PersonRow key={row.id} person={other}>
-            <ConnectionActions connectionId={row.id} mode="connected" />
+            <ConnectionActions connectionId={row.id} mode="connected" username={other.username} />
           </PersonRow>
         ))}
       </Section>

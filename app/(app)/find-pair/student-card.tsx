@@ -72,7 +72,7 @@ export function StudentCard({ candidate: c }: { candidate: Candidate }) {
       )}
 
       <div className="mt-auto">
-        <ConnectionButton userId={c.id} relation={c.relation} />
+        <ConnectionButton userId={c.id} username={c.username} relation={c.relation} />
       </div>
     </Card>
   );

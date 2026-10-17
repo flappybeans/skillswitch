@@ -1,6 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/buttons";
+import Link from "next/link";
+import { Button, buttonClasses } from "@/components/ui/buttons";
 import { useAction } from "@/lib/use-action";
 import {
   acceptRequest,
@@ -12,9 +13,10 @@ import {
 interface ConnectionActionsProps {
   connectionId: string;
   mode: "incoming" | "sent" | "connected";
+  username?: string; // needed for the Message link in "connected" mode
 }
 
-export function ConnectionActions({ connectionId, mode }: ConnectionActionsProps) {
+export function ConnectionActions({ connectionId, mode, username }: ConnectionActionsProps) {
   const { pending, error, run } = useAction();
 
   return (
@@ -46,18 +48,25 @@ export function ConnectionActions({ connectionId, mode }: ConnectionActionsProps
           </Button>
         )}
         {mode === "connected" && (
-          <Button
-            size="sm"
-            variant="ghost"
-            disabled={pending}
-            onClick={() => {
-              if (window.confirm("Remove this connection?")) {
-                run(() => removeConnection(connectionId));
-              }
-            }}
-          >
-            Remove
-          </Button>
+          <>
+            {username && (
+              <Link href={`/messages/${username}`} className={buttonClasses({ size: "sm" })}>
+                Message
+              </Link>
+            )}
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={pending}
+              onClick={() => {
+                if (window.confirm("Remove this connection?")) {
+                  run(() => removeConnection(connectionId));
+                }
+              }}
+            >
+              Remove
+            </Button>
+          </>
         )}
       </div>
       {error && <p className="text-xs font-medium text-danger">{error}</p>}
