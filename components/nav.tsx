@@ -42,7 +42,7 @@ export function Nav() {
       <header className="sticky top-0 z-40 border-b border-line bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
           <Link
-            href="/design"
+            href="/find-pair"
             className="flex items-center gap-2.5 font-display text-lg font-medium tracking-tight"
           >
             <span className="grid size-8 place-items-center rounded-md bg-primary text-primary-foreground">
