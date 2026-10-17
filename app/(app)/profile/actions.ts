@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { field, USERNAME_RE } from "@/lib/form";
+import { isUuid } from "@/lib/form";
+import { isSkillKind, MAX_SKILLS_PER_KIND, type SkillKind } from "@/lib/skills";
 
 export type ProfileValues = {
   full_name: string;
@@ -148,6 +150,62 @@ export async function removeAvatar(): Promise<{ error: string | null }> {
   if (oldPath) {
     await supabase.storage.from("avatars").remove([oldPath]);
   }
+
+  revalidatePath("/", "layout");
+  return { error: null };
+}
+
+// Arguments from the client are untrusted, whatever their TS types claim,
+// so `kind` is typed as a plain string and validated here.
+export async function setSkill(
+  skillId: string,
+  kind: string,
+  selected: boolean
+): Promise<{ error: string | null }> {
+  if (!isUuid(skillId) || !isSkillKind(kind)) return { error: "Invalid skill." };
+  // From here on, TS knows `kind` is "teach" | "learn"
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "You're not logged in." };
+
+  if (!selected) {
+    const { error } = await supabase
+      .from("user_skills")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("skill_id", skillId)
+      .eq("kind", kind);
+    if (error) return { error: "Couldn't update your skills." };
+
+    revalidatePath("/", "layout");
+    return { error: null };
+  }
+
+  const { error } = await supabase
+    .from("user_skills")
+    .insert({ user_id: user.id, skill_id: skillId, kind });
+
+  // 23505 = already selected, which is fine
+  if (error && error.code !== "23505") {
+    if (error.code === "23514") {
+      return { error: `You can pick at most ${MAX_SKILLS_PER_KIND} skills to ${kind}.` };
+    }
+    if (error.code === "23503") return { error: "That skill doesn't exist." };
+    return { error: "Couldn't update your skills." };
+  }
+
+  // A skill can't be both taught and learned. Insert first, then clear the other side,
+  // so a failed insert never costs the user their existing choice.
+  const other: SkillKind = kind === "teach" ? "learn" : "teach";
+  await supabase
+    .from("user_skills")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("skill_id", skillId)
+    .eq("kind", other);
 
   revalidatePath("/", "layout");
   return { error: null };
