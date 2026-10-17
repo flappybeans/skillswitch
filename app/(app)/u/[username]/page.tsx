@@ -8,6 +8,7 @@ import { buttonClasses } from "@/components/ui/buttons";
 import { Card } from "@/components/ui/card";
 import { getCurrentProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { connection } from "next/server";
 
 type Params = Promise<{ username: string }>;
 
@@ -30,6 +31,8 @@ export default function PublicProfilePage({ params }: { params: Params }) {
 }
 
 async function PublicProfile({ params }: { params: Params }) {
+  await connection();
+
   const { username } = await params;
   const supabase = await createClient();
 

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { getCurrentProfile } from "@/lib/auth";
+import { connection } from "next/server";
 
 export default function FindPairPage() {
   return (
@@ -16,6 +17,8 @@ export default function FindPairPage() {
 }
 
 async function WhoAmI() {
+  await connection();
+
   const profile = await getCurrentProfile();
 
   return (

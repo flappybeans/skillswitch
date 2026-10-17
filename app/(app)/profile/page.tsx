@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { getCurrentProfile } from "@/lib/auth";
 import { AvatarUploader } from "./avatar-uploader";
 import { ProfileForm } from "./profile-form";
+import { connection } from "next/server";
 
 export default function ProfilePage() {
   return (
@@ -20,6 +21,8 @@ export default function ProfilePage() {
 }
 
 async function ProfileEditor() {
+  await connection();
+
   const profile = await getCurrentProfile();
   if (!profile) redirect("/login");
 
