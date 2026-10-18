@@ -30,11 +30,14 @@ const items: NavItem[] = [
   { href: "/profile", label: "Profile", icon: User },
 ];
 
-export function Nav({ messagesBadge }: { messagesBadge?: React.ReactNode }) {
-  const pathname = usePathname();
+interface NavShellProps {
+  pathname: string | null; // null = "don't know yet", so nothing is highlighted
+  messagesBadge?: React.ReactNode;
+}
 
+function NavShell({ pathname, messagesBadge }: NavShellProps) {
   const isActive = (href: string): boolean =>
-    pathname === href || pathname.startsWith(href + "/");
+    pathname !== null && (pathname === href || pathname.startsWith(href + "/"));
 
   return (
     <>
@@ -92,9 +95,7 @@ export function Nav({ messagesBadge }: { messagesBadge?: React.ReactNode }) {
               href={item.href}
               className={cn(
                 "flex flex-1 flex-col items-center gap-1 py-2.5 text-[11px] font-medium transition-colors",
-                isActive(item.href)
-                  ? "text-primary-ink"
-                  : "text-muted-foreground"
+                isActive(item.href) ? "text-primary-ink" : "text-muted-foreground"
               )}
             >
               <span className="relative">
@@ -110,4 +111,15 @@ export function Nav({ messagesBadge }: { messagesBadge?: React.ReactNode }) {
       </nav>
     </>
   );
+}
+
+// The real nav. Reads the URL, so it must live inside a <Suspense>.
+export function Nav({ messagesBadge }: { messagesBadge?: React.ReactNode }) {
+  const pathname = usePathname();
+  return <NavShell pathname={pathname} messagesBadge={messagesBadge} />;
+}
+
+// What shows while the real nav streams in: same layout, no highlight, no badge
+export function NavFallback() {
+  return <NavShell pathname={null} />;
 }
