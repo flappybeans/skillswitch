@@ -17,3 +17,7 @@ export function firstString(value: string | string[] | undefined): string {
   if (Array.isArray(value)) return value[0] ?? "";
   return value ?? "";
 }
+
+export function cleanSearch(value: string, max = 50): string {
+  return value.replace(/[^\p{L}\p{N}_ .-]/gu, "").trim().slice(0, max);
+}

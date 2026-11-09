@@ -33,9 +33,10 @@ const items: NavItem[] = [
 interface NavShellProps {
   pathname: string | null; // null = "don't know yet", so nothing is highlighted
   messagesBadge?: React.ReactNode;
+  adminLink?: React.ReactNode;
 }
 
-function NavShell({ pathname, messagesBadge }: NavShellProps) {
+function NavShell({ pathname, messagesBadge, adminLink }: NavShellProps) {
   const isActive = (href: string): boolean =>
     pathname !== null && (pathname === href || pathname.startsWith(href + "/"));
 
@@ -76,12 +77,15 @@ function NavShell({ pathname, messagesBadge }: NavShellProps) {
             })}
           </nav>
 
-          <form action={logout}>
-            <Button variant="ghost" size="sm" type="submit">
-              <LogOut className="size-4" />
-              <span className="hidden sm:inline">Log out</span>
-            </Button>
-          </form>
+            <div className="flex items-center gap-1">
+              {adminLink}
+              <form action={logout}>
+                <Button variant="ghost" size="sm" type="submit">
+                  <LogOut className="size-4" />
+                  <span className="hidden sm:inline">Log out</span>
+                </Button>
+              </form>
+            </div>
         </div>
       </header>
 
@@ -114,9 +118,15 @@ function NavShell({ pathname, messagesBadge }: NavShellProps) {
 }
 
 // The real nav. Reads the URL, so it must live inside a <Suspense>.
-export function Nav({ messagesBadge }: { messagesBadge?: React.ReactNode }) {
+export function Nav({
+  messagesBadge,
+  adminLink,
+}: {
+  messagesBadge?: React.ReactNode;
+  adminLink?: React.ReactNode;
+}) {
   const pathname = usePathname();
-  return <NavShell pathname={pathname} messagesBadge={messagesBadge} />;
+  return <NavShell pathname={pathname} messagesBadge={messagesBadge} adminLink={adminLink} />;
 }
 
 // What shows while the real nav streams in: same layout, no highlight, no badge

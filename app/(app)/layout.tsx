@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { AdminNavLink } from "@/components/admin-nav-link";
 import { Nav, NavFallback } from "@/components/nav";
 import { UnreadBadge } from "@/components/unread-badge";
 
@@ -14,6 +15,11 @@ export default function AppLayout({
           messagesBadge={
             <Suspense fallback={null}>
               <UnreadBadge />
+            </Suspense>
+          }
+          adminLink={
+            <Suspense fallback={null}>
+              <AdminNavLink />
             </Suspense>
           }
         />
