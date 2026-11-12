@@ -140,3 +140,27 @@ export async function runScan(): Promise<ScanResult> {
   refresh();
   return { error: null, added: data ?? 0 };
 }
+
+export async function resolveSuggestion(
+  id: string,
+  action: string,
+  target: string
+): Promise<ActionResult> {
+  if (!isUuid(id)) return fail("Invalid suggestion.");
+  if (action !== "approve" && action !== "reject" && action !== "merge") return fail("Invalid action.");
+  if (action === "merge" && !isUuid(target)) return fail("Pick the skill to merge into.");
+
+  const admin = await getAdmin();
+  if (!admin) return fail("Not allowed.");
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_resolve_suggestion", {
+    p_id: id,
+    p_action: action,
+    p_target: action === "merge" ? target : undefined,
+  });
+  if (error) return fail(explain(error, "Couldn't update that suggestion."));
+
+  refresh();
+  return OK;
+}

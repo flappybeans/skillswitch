@@ -36,6 +36,7 @@ export async function sendMessage(
     .single();
 
   if (error || !data) {
+    if (error?.code === "SK001") return fail(error.message);
     // 42501 = the RLS policy refused: not connected (or deactivated)
     if (error?.code === "42501") {
       return fail("You can only message people you're connected with.");

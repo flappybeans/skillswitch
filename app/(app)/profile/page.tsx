@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AvatarUploader } from "./avatar-uploader";
 import { ProfileForm } from "./profile-form";
 import { SkillPicker } from "./skill-picker";
+import { SuggestSkill } from "./suggest-skill";
 
 export default function ProfilePage() {
   return (
@@ -27,9 +28,15 @@ async function ProfileEditor() {
   if (!profile) redirect("/login");
 
   const supabase = await createClient();
-  const [skillsRes, mineRes] = await Promise.all([
+    const [skillsRes, mineRes, suggestRes] = await Promise.all([
     supabase.from("skills").select("id, name").order("name"),
     supabase.from("user_skills").select("skill_id, kind").eq("user_id", profile.id),
+    supabase
+      .from("skill_suggestions")
+      .select("id, name, status")
+      .eq("user_id", profile.id)
+      .order("created_at", { ascending: false })
+      .limit(5),
   ]);
 
   const skills = skillsRes.data ?? [];
@@ -85,6 +92,8 @@ async function ProfileEditor() {
             initialTeach={idsOfKind("teach")}
             initialLearn={idsOfKind("learn")}
           />
+
+          <SuggestSkill recent={suggestRes.data ?? []} />
         </Card>
       </div>
     </div>

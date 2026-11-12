@@ -343,6 +343,61 @@ export type Database = {
           },
         ]
       }
+      skill_suggestions: {
+        Row: {
+          created_at: string
+          id: string
+          merged_into: string | null
+          name: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          merged_into?: string | null
+          name: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          merged_into?: string | null
+          name?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skill_suggestions_merged_into_fkey"
+            columns: ["merged_into"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_suggestions_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_suggestions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       skills: {
         Row: {
           id: string
@@ -398,6 +453,10 @@ export type Database = {
     Functions: {
       admin_resolve_flag: {
         Args: { p_flag: string; p_note?: string; p_status: string }
+        Returns: undefined
+      }
+      admin_resolve_suggestion: {
+        Args: { p_action: string; p_id: string; p_target?: string }
         Returns: undefined
       }
       admin_revert_event: {

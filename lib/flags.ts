@@ -61,6 +61,9 @@ const ACTION_LABEL: Record<string, string> = {
   dismiss_flag: "Dismissed a flag on",
   action_flag: "Actioned a flag on",
   revert_points: "Reverted points for",
+  approve_skill: "Approved a skill suggestion from",
+  reject_skill: "Rejected a skill suggestion from",
+  merge_skill: "Merged a skill suggestion from",
 };
 
 export function actionLabel(action: string): string {

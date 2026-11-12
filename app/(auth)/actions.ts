@@ -2,19 +2,12 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { field, USERNAME_RE } from "@/lib/form";
+import { safeNext, field, USERNAME_RE } from "@/lib/form";
 
 export type AuthState = {
   error: string | null;
   notice: string | null;
 };
-
-// Only allow redirects to paths inside our own site (blocks open-redirect attacks)
-function safeNext(value: string): string {
-  const isInternal =
-    value.startsWith("/") && !value.startsWith("//") && !value.startsWith("/\\");
-  return isInternal ? value : "/find-pair";
-}
 
 export async function login(
   _prev: AuthState,
@@ -31,6 +24,10 @@ export async function login(
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
+    if (error.code === "email_not_confirmed") {
+    return { error: "Confirm your email first. Check your inbox.", notice: null };
+    }
+    
     if (error.code === "user_banned") {
       return { error: "This account has been deactivated.", notice: null };
     }

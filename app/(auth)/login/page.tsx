@@ -26,9 +26,12 @@ async function LoginContent({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-
+  
+  const confirmFailed = params.error === "confirm";
   const next = typeof params.next === "string" ? params.next : "/find-pair";
   const deactivated = params.error === "deactivated";
+
+
 
   return (
     <>
@@ -38,6 +41,14 @@ async function LoginContent({
           className="rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-sm font-medium text-danger"
         >
           This account has been deactivated.
+        </p>
+      )}
+      {confirmFailed && (
+        <p
+          role="alert"
+          className="rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-sm font-medium text-danger"
+        >
+          That confirmation link is invalid or expired. Log in, or sign up again.
         </p>
       )}
       <LoginForm next={next} />

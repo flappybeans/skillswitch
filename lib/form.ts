@@ -21,3 +21,9 @@ export function firstString(value: string | string[] | undefined): string {
 export function cleanSearch(value: string, max = 50): string {
   return value.replace(/[^\p{L}\p{N}_ .-]/gu, "").trim().slice(0, max);
 }
+
+export function safeNext(value: string): string {
+  const isInternal =
+    value.startsWith("/") && !value.startsWith("//") && !value.startsWith("/\\");
+  return isInternal ? value : "/find-pair";
+}

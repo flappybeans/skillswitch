@@ -56,7 +56,8 @@ export async function sendRequest(addresseeId: string): Promise<ActionResult> {
     refresh();
     return OK;
   }
-  if (error.code !== "23505") {
+    if (error.code !== "23505") {
+    if (error.code === "SK001") return fail(error.message);
     return fail(
       error.code === "23503" ? "That user doesn't exist." : "Couldn't send the request."
     );
