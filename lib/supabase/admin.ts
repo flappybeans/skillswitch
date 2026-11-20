@@ -1,4 +1,4 @@
-import "server-only"; // the build FAILS if a client component ever imports this file
+import "server-only"; 
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
 import { SUPABASE_URL } from "./env";

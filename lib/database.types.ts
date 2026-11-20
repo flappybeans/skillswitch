@@ -343,6 +343,39 @@ export type Database = {
           },
         ]
       }
+      skill_suggestion_supporters: {
+        Row: {
+          created_at: string
+          suggestion_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          suggestion_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          suggestion_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skill_suggestion_supporters_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "skill_suggestions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_suggestion_supporters_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       skill_suggestions: {
         Row: {
           created_at: string
@@ -537,11 +570,20 @@ export type Database = {
           unread_count: number
         }[]
       }
+      my_suggestions: {
+        Args: never
+        Returns: {
+          id: string
+          name: string
+          status: string
+        }[]
+      }
       respond_to_session: {
         Args: { p_accept: boolean; p_session: string }
         Returns: undefined
       }
       run_fraud_scan: { Args: never; Returns: number }
+      suggest_skill: { Args: { p_name: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

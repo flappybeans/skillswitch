@@ -23,6 +23,14 @@ export function LoginForm({ next }: { next: string }) {
         autoComplete="current-password"
         required
       />
+      <div className="flex justify-end">
+        <Link
+          href="/forgot-password"
+          className="text-sm font-medium text-primary-ink underline underline-offset-4"
+        >
+          Forgot password?
+        </Link>
+      </div>
 
       {state.error && (
         <p

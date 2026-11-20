@@ -31,12 +31,7 @@ async function ProfileEditor() {
     const [skillsRes, mineRes, suggestRes] = await Promise.all([
     supabase.from("skills").select("id, name").order("name"),
     supabase.from("user_skills").select("skill_id, kind").eq("user_id", profile.id),
-    supabase
-      .from("skill_suggestions")
-      .select("id, name, status")
-      .eq("user_id", profile.id)
-      .order("created_at", { ascending: false })
-      .limit(5),
+    supabase.rpc("my_suggestions"),
   ]);
 
   const skills = skillsRes.data ?? [];
@@ -93,7 +88,7 @@ async function ProfileEditor() {
             initialLearn={idsOfKind("learn")}
           />
 
-          <SuggestSkill recent={suggestRes.data ?? []} />
+          <SuggestSkill recent={suggestRes.data ?? []} existing={skills.map((s) => s.name)} />
         </Card>
       </div>
     </div>

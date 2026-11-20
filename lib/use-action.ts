@@ -6,9 +6,10 @@ export function useAction() {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  function run(action: () => Promise<{ error: string | null }>) {
+  function run(action: () => Promise<{ error: string | null }>, optimistic?: () => void) {
     setError(null);
     startTransition(async () => {
+      optimistic?.();
       const result = await action();
       if (result.error) setError(result.error);
     });

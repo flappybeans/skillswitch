@@ -1,10 +1,8 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { LocalTime } from "@/components/local-time";
 import { requireAdmin } from "@/lib/admin";
 import { createClient } from "@/lib/supabase/server";
-import { SuggestionActions } from "../suggestion-actions";
+import { SuggestionRow, type Supporter } from "../suggestion-row";
 
 export default function AdminSkillsPage() {
   return (
@@ -21,7 +19,7 @@ async function Suggestions() {
   const [pendingRes, skillsRes] = await Promise.all([
     supabase
       .from("skill_suggestions")
-      .select("id, user_id, name, created_at")
+      .select("id, name, created_at")
       .eq("status", "pending")
       .order("created_at")
       .limit(50),
@@ -35,13 +33,6 @@ async function Suggestions() {
   const pending = pendingRes.data ?? [];
   const skills = skillsRes.data ?? [];
 
-  const userIds = [...new Set(pending.map((s) => s.user_id))];
-  const { data: people } =
-    userIds.length > 0
-      ? await supabase.from("profiles").select("id, username, full_name").in("id", userIds)
-      : { data: [] };
-  const byId = new Map((people ?? []).map((p) => [p.id, p] as const));
-
   if (pending.length === 0) {
     return (
       <Card className="text-center">
@@ -50,11 +41,38 @@ async function Suggestions() {
     );
   }
 
+  const { data: supporterRows } = await supabase
+    .from("skill_suggestion_supporters")
+    .select("suggestion_id, user_id, created_at")
+    .in("suggestion_id", pending.map((s) => s.id))
+    .order("created_at");
+  const rows = supporterRows ?? [];
+
+  const userIds = [...new Set(rows.map((r) => r.user_id))];
+  const { data: people } =
+    userIds.length > 0
+      ? await supabase.from("profiles").select("id, username, full_name").in("id", userIds)
+      : { data: [] };
+  const personById = new Map((people ?? []).map((p) => [p.id, p] as const));
+
+  const supportersOf = new Map<string, Supporter[]>();
+  for (const r of rows) {
+    const p = personById.get(r.user_id);
+    if (!p) continue;
+    const list = supportersOf.get(r.suggestion_id) ?? [];
+    list.push({ id: p.id, name: p.full_name ?? p.username, username: p.username, createdAt: r.created_at });
+    supportersOf.set(r.suggestion_id, list);
+  }
+
+  // Most-wanted first. The query was oldest-first, and sort() is stable, so ties stay oldest-first.
+  const sorted = [...pending].sort(
+    (a, b) => (supportersOf.get(b.id)?.length ?? 0) - (supportersOf.get(a.id)?.length ?? 0)
+  );
+
   return (
     <Card className="overflow-hidden p-0">
       <ul className="divide-y divide-line">
-        {pending.map((s) => {
-          const user = byId.get(s.user_id);
+        {sorted.map((s) => {
           const lower = s.name.toLowerCase();
           // "JS" vs "JavaScript": existing skills whose name contains, or is contained in, the suggestion
           const similar = skills.filter((k) => {
@@ -63,27 +81,15 @@ async function Suggestions() {
           });
 
           return (
-            <li key={s.id} className="flex flex-wrap items-start gap-3 px-4 py-4">
-              <div className="min-w-0 flex-1 space-y-1">
-                <p className="font-medium">{s.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {user ? (
-                    <Link href={`/admin/users/${user.username}`} className="hover:underline">
-                      {user.full_name ?? user.username}
-                    </Link>
-                  ) : (
-                    "Removed user"
-                  )}{" "}
-                  · <LocalTime iso={s.created_at} style="full" />
-                </p>
-                {similar.length > 0 && (
-                  <p className="text-sm text-primary-ink">
-                    Looks similar to: {similar.map((k) => k.name).join(", ")}
-                  </p>
-                )}
-              </div>
-              <SuggestionActions id={s.id} skills={skills} defaultTarget={similar[0]?.id ?? ""} />
-            </li>
+            <SuggestionRow
+              key={s.id}
+              id={s.id}
+              name={s.name}
+              supporters={supportersOf.get(s.id) ?? []}
+              similar={similar.map((k) => k.name)}
+              skills={skills}
+              defaultTarget={similar[0]?.id ?? ""}
+            />
           );
         })}
       </ul>

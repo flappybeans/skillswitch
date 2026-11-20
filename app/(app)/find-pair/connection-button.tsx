@@ -1,7 +1,8 @@
 "use client";
 
+import { useOptimistic } from "react";
 import Link from "next/link";
-import { Check, Clock, MessageCircle } from "lucide-react";
+import { Clock, MessageCircle } from "lucide-react";
 import { Button, buttonClasses } from "@/components/ui/buttons";
 import { assertNever } from "@/lib/assert";
 import type { Relation } from "@/lib/connections";
@@ -21,18 +22,26 @@ export function ConnectionButton({
   username: string;
   relation: Relation;
 }) {
-  const { pending, error, run } = useAction();
+  const { error, run } = useAction();
+
+  // `relation` is what the server knows. `shown` is what we display: it flips the moment you
+  // click, then settles on the real value (or snaps back, if the action failed).
+  const [shown, setShown] = useOptimistic(relation);
 
   function body(): React.ReactNode {
-    switch (relation.kind) {
+    switch (shown.kind) {
       case "none":
         return (
           <Button
             className="w-full"
-            disabled={pending}
-            onClick={() => run(() => sendRequest(userId))}
+            onClick={() =>
+              run(
+                () => sendRequest(userId),
+                () => setShown({ kind: "sent", connectionId: "" })
+              )
+            }
           >
-            {pending ? "Sending..." : "Connect"}
+            Connect
           </Button>
         );
       case "sent":
@@ -41,27 +50,37 @@ export function ConnectionButton({
             <Clock className="size-4" /> Requested
           </Button>
         );
-      case "received":
+      case "received": {
+        const connectionId = shown.connectionId;
         return (
           <div className="flex gap-2">
             <Button
               className="flex-1"
-              disabled={pending}
-              onClick={() => run(() => acceptRequest(relation.connectionId))}
+              onClick={() =>
+                run(
+                  () => acceptRequest(connectionId),
+                  () => setShown({ kind: "connected", connectionId })
+                )
+              }
             >
               Accept
             </Button>
             <Button
               variant="outline"
               className="flex-1"
-              disabled={pending}
-              onClick={() => run(() => declineRequest(relation.connectionId))}
+              onClick={() =>
+                run(
+                  () => declineRequest(connectionId),
+                  () => setShown({ kind: "none" })
+                )
+              }
             >
               Decline
             </Button>
           </div>
         );
-            case "connected":
+      }
+      case "connected":
         return (
           <Link
             href={`/messages/${username}`}
@@ -71,7 +90,7 @@ export function ConnectionButton({
           </Link>
         );
       default:
-        return assertNever(relation);
+        return assertNever(shown);
     }
   }
 

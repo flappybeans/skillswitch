@@ -87,3 +87,61 @@ export async function logout() {
   await supabase.auth.signOut();
   redirect("/login");
 }
+
+export async function requestPasswordReset(
+  _prev: AuthState,
+  formData: FormData
+): Promise<AuthState> {
+  const email = field(formData, "email").trim();
+  if (!email) return { error: "Enter your email.", notice: null };
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email);
+  if (error) {
+    return { error: "Couldn't send the email. Try again in a few minutes.", notice: null };
+  }
+
+  // Same message whether or not the account exists, so nobody can probe for emails
+  return {
+    error: null,
+    notice: "If an account exists for that email, a reset link is on its way.",
+  };
+}
+
+export async function updatePassword(
+  _prev: AuthState,
+  formData: FormData
+): Promise<AuthState> {
+  const password = field(formData, "password");
+  const confirm = field(formData, "confirm");
+
+  if (password.length < 8) {
+    return { error: "Password must be at least 8 characters.", notice: null };
+  }
+  if (password !== confirm) {
+    return { error: "The two passwords don't match.", notice: null };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "This reset link has expired. Request a new one.", notice: null };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    return {
+      error:
+        error.code === "same_password"
+          ? "Choose a different password from your current one."
+          : "Couldn't update your password. Try again.",
+      notice: null,
+    };
+  }
+
+  // If someone else had the old password, kick their sessions out
+  await supabase.auth.signOut({ scope: "others" });
+  redirect("/find-pair");
+}

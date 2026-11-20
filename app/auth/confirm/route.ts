@@ -4,9 +4,8 @@ import type { NextRequest } from "next/server";
 import { safeNext } from "@/lib/form";
 import { createClient } from "@/lib/supabase/server";
 
-const TYPES: readonly EmailOtpType[] = ["signup", "email"];
+const TYPES: readonly EmailOtpType[] = ["signup", "email", "recovery"];
 
-// A URL param is any string. This guard proves it's one of the types we accept.
 function isOtpType(value: string | null): value is EmailOtpType {
   return TYPES.some((t) => t === value);
 }
@@ -20,7 +19,7 @@ export async function GET(request: NextRequest) {
   if (tokenHash && isOtpType(type)) {
     const supabase = await createClient();
     const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
-    if (!error) redirect(next); // redirect() throws, so it lives outside any try/catch
+      if (!error) redirect(type === "recovery" ? "/reset-password" : next); 
   }
   redirect("/login?error=confirm");
 }

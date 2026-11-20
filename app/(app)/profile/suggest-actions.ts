@@ -17,11 +17,9 @@ export async function suggestSkill(name: string): Promise<ActionResult> {
   } = await supabase.auth.getUser();
   if (!user) return { error: "You're not logged in." };
 
-  const { error } = await supabase.from("skill_suggestions").insert({ user_id: user.id, name: text });
+  const { error } = await supabase.rpc("suggest_skill", { p_name: text });
   if (error) {
-    if (error.code === "SK001") return { error: error.message };
-    if (error.code === "23505") return { error: "Someone already suggested that. Thanks!" };
-    return { error: "Couldn't send your suggestion." };
+    return { error: error.code === "SK001" ? error.message : "Couldn't send your suggestion." };
   }
 
   revalidatePath("/", "layout");

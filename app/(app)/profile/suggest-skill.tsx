@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/buttons";
 import { Input } from "@/components/ui/input";
@@ -15,18 +15,43 @@ const LABEL: Record<string, string> = {
   merged: "Already covered",
 };
 
-export function SuggestSkill({ recent }: { recent: Suggestion[] }) {
+interface SuggestSkillProps {
+  recent: Suggestion[];
+  existing: string[]; // names already in the skill list, for an instant duplicate check
+}
+
+export function SuggestSkill({ recent, existing }: SuggestSkillProps) {
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
+
+  // `shown` = the server's list, plus any suggestion still on its way
+  const [shown, addShown] = useOptimistic(
+    recent,
+    (current: Suggestion[], newName: string): Suggestion[] =>
+      [{ id: `temp-${newName}`, name: newName, status: "pending" }, ...current].slice(0, 5)
+  );
 
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const clean = name.trim().replace(/\s+/g, " ");
+    if (clean.length < 2) return;
+
+    // Cheap checks first, so a doomed suggestion never flashes on screen
+    if (existing.some((n) => n.toLowerCase() === clean.toLowerCase())) {
+      setError("That skill already exists. Look for it in the list.");
+      return;
+    }
+
     setError(null);
+    setName(""); // clear the box now
     startTransition(async () => {
-      const result = await suggestSkill(name);
-      if (result.error) setError(result.error);
-      else setName("");
+      addShown(clean); // the chip appears now
+      const result = await suggestSkill(clean);
+      if (result.error) {
+        setError(result.error); // the chip disappears by itself
+        setName(clean); // and the text comes back
+      }
     });
   }
 
@@ -44,8 +69,8 @@ export function SuggestSkill({ recent }: { recent: Suggestion[] }) {
           placeholder="e.g. Figma"
           aria-label="Skill name"
         />
-        <Button type="submit" disabled={pending || name.trim().length < 2}>
-          {pending ? "Sending..." : "Suggest"}
+        <Button type="submit" disabled={name.trim().length < 2}>
+          Suggest
         </Button>
       </form>
       {error && (
@@ -53,9 +78,9 @@ export function SuggestSkill({ recent }: { recent: Suggestion[] }) {
           {error}
         </p>
       )}
-      {recent.length > 0 && (
+      {shown.length > 0 && (
         <ul className="flex flex-wrap gap-2">
-          {recent.map((s) => (
+          {shown.map((s) => (
             <li key={s.id}>
               <Badge tone={s.status === "approved" ? "points" : "outline"}>
                 {s.name} · {LABEL[s.status] ?? s.status}

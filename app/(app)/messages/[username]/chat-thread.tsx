@@ -38,6 +38,8 @@ function withDayMarkers(messages: Message[]): Item[] {
   return items;
 }
 
+type Pending = { tempId: string; content: string; createdAt: string; failed: boolean };
+
 interface ChatThreadProps {
   meId: string;
   otherId: string;
@@ -64,7 +66,7 @@ export function ChatThread({
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loadingMore, setLoadingMore] = useState(false);
   const [text, setText] = useState("");
-  const [sending, setSending] = useState(false);
+  const [pending, setPending] = useState<Pending[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const listRef = useRef<HTMLDivElement>(null);
@@ -96,6 +98,14 @@ export function ChatThread({
 
       setMessages((prev) => withMessage(prev, row));
       if (row.receiver_id === meId) markRead();
+
+            if (row.sender_id === meId) {
+        // The database just confirmed one of our own messages, so drop its temporary bubble
+        setPending((prev) => {
+          const i = prev.findIndex((p) => !p.failed && p.content === row.content);
+          return i === -1 ? prev : prev.filter((_, j) => j !== i);
+        });
+      }
     }
 
     // Two subscriptions: messages sent TO me (from anyone) and BY me (other tabs/devices).
@@ -144,24 +154,50 @@ export function ChatThread({
   }
 
   // ----- Actions -----
-  async function send() {
+    function dispatch(tempId: string, content: string) {
+    const fail = (message: string) => {
+      setPending((prev) => prev.map((p) => (p.tempId === tempId ? { ...p, failed: true } : p)));
+      setError(message);
+    };
+
+    sendMessage(otherId, content)
+      .then((result) => {
+        if (result.error !== null) {
+          fail(result.error);
+          return;
+        }
+        const sent = result.message;
+        setMessages((prev) => withMessage(prev, sent));
+        setPending((prev) => prev.filter((p) => p.tempId !== tempId));
+      })
+      .catch(() => fail("Couldn't send. Check your connection."));
+  }
+
+  function send() {
     const content = text.trim();
-    if (!content || sending || !canSend) return;
+    if (!content || !canSend) return;
 
-    setSending(true);
-    setError(null);
-    setText("");
+    const tempId = crypto.randomUUID();
     stickToBottom.current = true;
+    setError(null);
+    setText(""); // the box clears and the bubble appears right away
+    setPending((prev) => [
+      ...prev,
+      { tempId, content, createdAt: new Date().toISOString(), failed: false },
+    ]);
+    dispatch(tempId, content);
+  }
 
-    const result = await sendMessage(otherId, content);
-    if (result.error !== null) {
-      setText(content); // give the text back so nothing is lost
-      setError(result.error);
-    } else {
-      const sent = result.message; // const: TS keeps the narrowed type inside the callback
-      setMessages((prev) => withMessage(prev, sent));
-    }
-    setSending(false);
+  function retry(tempId: string) {
+    const item = pending.find((p) => p.tempId === tempId);
+    if (!item) return;
+    setError(null);
+    setPending((prev) => prev.map((p) => (p.tempId === tempId ? { ...p, failed: false } : p)));
+    dispatch(tempId, item.content);
+  }
+
+  function discard(tempId: string) {
+    setPending((prev) => prev.filter((p) => p.tempId !== tempId));
   }
 
   async function loadEarlier() {
@@ -219,6 +255,7 @@ export function ChatThread({
 
         {isClient &&
           withDayMarkers(messages).map((item) =>
+            
             item.kind === "day" ? (
               <p
                 key={`day-${item.key}`}
@@ -229,11 +266,24 @@ export function ChatThread({
             ) : (
               <Bubble
                 key={item.message.id}
-                message={item.message}
+                content={item.message.content}
+                createdAt={item.message.created_at}
                 mine={item.message.sender_id === meId}
               />
             )
           )}
+          {isClient &&
+          pending.map((p) => (
+            <Bubble
+              key={p.tempId}
+              content={p.content}
+              createdAt={p.createdAt}
+              mine
+              status={p.failed ? "failed" : "sending"}
+              onRetry={() => retry(p.tempId)}
+              onDiscard={() => discard(p.tempId)}
+            />
+          ))}
       </div>
 
       {canSend ? (
@@ -260,7 +310,7 @@ export function ChatThread({
               aria-label="Message"
               className="field-sizing-content max-h-32 min-h-10 flex-1 resize-none py-2"
             />
-            <Button type="submit" aria-label="Send" disabled={sending || text.trim() === ""}>
+            <Button type="submit" aria-label="Send" disabled={text.trim() === ""}>
               <Send className="size-4" />
             </Button>
           </div>
@@ -274,26 +324,54 @@ export function ChatThread({
   );
 }
 
-function Bubble({ message, mine }: { message: Message; mine: boolean }) {
+interface BubbleProps {
+  content: string;
+  createdAt: string;
+  mine: boolean;
+  status?: "sending" | "failed";
+  onRetry?: () => void;
+  onDiscard?: () => void;
+}
+
+function Bubble({ content, createdAt, mine, status, onRetry, onDiscard }: BubbleProps) {
   return (
     <div className={cn("flex", mine ? "justify-end" : "justify-start")}>
-      <div
-        className={cn(
-          "max-w-[80%] rounded-2xl px-3.5 py-2 text-sm",
-          mine
-            ? "rounded-br-md bg-primary text-primary-foreground"
-            : "rounded-bl-md bg-muted text-foreground"
-        )}
-      >
-        <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{message.content}</p>
-        <p
+      <div className="flex max-w-[80%] flex-col items-end gap-1">
+        <div
           className={cn(
-            "mt-0.5 text-right text-[11px]",
-            mine ? "text-primary-foreground/70" : "text-muted-foreground"
+            "rounded-2xl px-3.5 py-2 text-sm",
+            mine
+              ? "rounded-br-md bg-primary text-primary-foreground"
+              : "rounded-bl-md bg-muted text-foreground",
+            status === "sending" && "opacity-70",
+            status === "failed" && "bg-danger text-danger-foreground"
           )}
         >
-          {formatStamp(message.created_at, "time")}
-        </p>
+          <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{content}</p>
+          <p
+            className={cn(
+              "mt-0.5 text-right text-[11px]",
+              status === "failed"
+                ? "text-danger-foreground/70"
+                : mine
+                  ? "text-primary-foreground/70"
+                  : "text-muted-foreground"
+            )}
+          >
+            {status === "sending" ? "Sending..." : formatStamp(createdAt, "time")}
+          </p>
+        </div>
+        {status === "failed" && (
+          <p className="flex items-center gap-2 text-xs font-medium text-danger">
+            Not sent
+            <button type="button" onClick={onRetry} className="underline underline-offset-2">
+              Retry
+            </button>
+            <button type="button" onClick={onDiscard} className="underline underline-offset-2">
+              Discard
+            </button>
+          </p>
+        )}
       </div>
     </div>
   );
